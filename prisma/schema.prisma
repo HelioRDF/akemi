@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://neondb_owner:npg_XzV6owTvxj8G@ep-purple-hill-ackdhdz5-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+}
+
+model Comercio {
+  id             String         @id @default(uuid())
+  name           String
+  slug           String         @unique
+  description    String
+  avatarImageUrl String
+  coverImageUrl  String
+  menuCategory   MenuCategory[]
+  product        Product[]
+  order          Order[]
+  createdAt      DateTime       @default(now())
+  updateAt       DateTime       @updatedAt
+}
+
+model MenuCategory {
+  id           String     @id @default(uuid())
+  name         String
+  comercio   Comercio @relation(fields: [comercioId], references: [id], onDelete: Cascade)
+  comercioId String
+  product      Product[]
+  createdAt    DateTime   @default(now())
+  updateAt     DateTime   @updatedAt
+}
+
+model Product {
+  id             String         @id @default(uuid())
+  name           String
+  description    String
+  price          Float
+  imageUrl       String
+  comercio     Comercio     @relation(fields: [comercioId], references: [id], onDelete: Cascade)
+  comercioId   String
+  menuCategory   MenuCategory   @relation(fields: [menuCategoryId], references: [id], onDelete: Cascade)
+  menuCategoryId String
+  orderProduct   OrderProduct[]
+  createdAt      DateTime       @default(now())
+  updateAt       DateTime       @updatedAt
+}
+
+model Order {
+  id                Int               @id @default(autoincrement())
+  total             Float
+  status            OrderStatus
+  consumptionMethod ConsumptionMethod
+  comercio        ComercioId        @relation(fields: [comercioId], references: [id], onDelete: Cascade)
+  comercioId      String
+  orderProducts     OrderProduct[]
+  customerName      String
+  customerCpf       String
+  customerCellPhone String
+  customerAdress    String
+  createdAt         DateTime          @default(now())
+  updateAt          DateTime          @updatedAt
+}
+
+model OrderProduct {
+  id        String   @id @default(uuid())
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   Int
+  quantity  Int
+  price     Float
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+}
+
+enum OrderStatus {
+  PENDING
+  IN_PREPARANTION
+  FINISHED
+}
+
+enum ConsumptionMethod {
+  TAKEAWAY
+  DINE_IN
+}
