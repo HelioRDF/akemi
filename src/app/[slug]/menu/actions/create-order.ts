@@ -6,11 +6,10 @@ import { redirect } from "next/navigation";
 
 import { db } from "@/lib/prisma";
 
-import { removeCpfPunctuation } from "../helpers/cpf";
 
 interface CreateOrderInput {
   customerName: string;
-  customerCpf: string;
+  customerCellPhone: string;
   products: Array<{
     id: string;
     quantity: number;
@@ -20,12 +19,12 @@ interface CreateOrderInput {
 }
 
 export const createOrder = async (input: CreateOrderInput) => {
-  const restaurant = await db.restaurant.findUnique({
+  const comercio = await db.comercio.findUnique({
     where: {
       slug: input.slug,
     },
   });
-  if (!restaurant) {
+  if (!comercio) {
     throw new Error("Restaurant not found");
   }
   const productsWithPrices = await db.product.findMany({
@@ -44,7 +43,7 @@ export const createOrder = async (input: CreateOrderInput) => {
     data: {
       status: "PENDING",
       customerName: input.customerName,
-      customerCpf: removeCpfPunctuation(input.customerCpf),
+      customerCellPhone: input.customerCellPhone,
       orderProducts: {
         createMany: {
           data: productsWithPricesAndQuantities,
@@ -55,10 +54,9 @@ export const createOrder = async (input: CreateOrderInput) => {
         0
       ),
       consumptionMethod: input.consumptionMethod,
-      restaurantId: restaurant.id,
+      comercioId: comercio.id,
     },
   });
   revalidatePath(`/${input.slug}/orders`);
-  redirect(`/${input.slug}/orders?cpf=${removeCpfPunctuation(input.customerCpf)}`,   );
   return order;
 };

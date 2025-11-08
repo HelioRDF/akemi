@@ -15,7 +15,7 @@ import CartSheet from "./cart-sheet";
 interface ProductDetailsProps {
   product: Prisma.ProductGetPayload<{
     include: {
-      restaurant: {
+      comercio: {
         select: {
           name: true;
           avatarImageUrl: true;
@@ -52,14 +52,14 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
         <div className="flex-auto overflow-hidden">
           <div className="flex items-center gap-1.5  ">
             <Image
-              src={product.restaurant.avatarImageUrl}
-              alt={product.restaurant.name}
+              src={product.comercio.avatarImageUrl}
+              alt={product.comercio.name}
               width={16}
               height={16}
               className="rounded-full"
             />
             <p className="text-xs text-muted-forground ">
-              {product.restaurant.name}
+              {product.comercio.name}
             </p>
           </div>
           <h2 className="mt-1 text-xl font-semibold">{product.name}</h2>
@@ -91,21 +91,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
               <p className="text-sm text-mute"> {product.description}</p>
             </div>
 
-            <div className="mt-9 space-y-3">
-              <div className="5 flex items-center gap-1">
-                <ChefHatIcon size={16}></ChefHatIcon>
-                <h4 className="font-semibold">Ingredientes</h4>
-              </div>
-              <div className="pb-20 h-full space-y-9">
-                <ul className="list-disc px-5 text-sm text-mute">
-                  {product.ingredients.map((ingredient: string) => {
-                    return <li key={ingredient}>{ingredient}</li>;
-                  })}
-                </ul>
-              </div>
-              <br></br>
-              <br></br>
-            </div>
+  
           </ScrollArea>
         </div>
         <Button className="pt=9 w-full " onClick={handleAddToCart}>

@@ -106,12 +106,7 @@ Iniciar o APP
 
 >npm run build //Verificar erros
 
-
-echo "# akemi" >> README.md
-git init
-git add README.md
-git commit -m "first commit"
-git branch -M main
-git remote add origin https://github.com/HelioRDF/akemi.git
-git push -u origin main
-...
+http://192.168.10.44:3000/akemi
+http://192.168.10.44:3000/akemi/orders?Cellphone=11-97564-0573
+http://192.168.10.44:3000/akemi/orders?cpf=11-97564-0573
+http://192.168.10.44:3000/akemi/orders?CustomerCellPhone=11-97564-0573

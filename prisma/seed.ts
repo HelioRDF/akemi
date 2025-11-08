@@ -8,7 +8,7 @@ const main = async () => {
     const comercio = await tx.comercio.create({
       data: {
         name: "AKEMI",
-        slug: "AKEMI",
+        slug: "akemi",
         description: "As melhores ofertas da cidade ",
 
         avatarImageUrl: "/akemi/perfil.jpg",
@@ -18,7 +18,7 @@ const main = async () => {
     const kitsCategory = await tx.menuCategory.create({
       data: {
         name: "Kits",
-        restaurantId: restaurant.id,
+        comercioId: comercio.id,
       },
     });
     await tx.product.createMany({
@@ -37,7 +37,7 @@ const main = async () => {
     const internoCategory = await tx.menuCategory.create({
       data: {
         name: "Interno",
-        restaurantId: comercio.id,
+        comercioId: comercio.id,
       },
     });
     await tx.product.createMany({

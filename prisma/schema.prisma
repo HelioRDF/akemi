@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://neondb_owner:npg_XzV6owTvxj8G@ep-purple-hill-ackdhdz5-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+  url      = "postgresql://neondb_owner:npg_DZwqS2k4acEP@ep-late-field-a8k05ki5-pooler.eastus2.azure.neon.tech/neondb?sslmode=require&channel_binding=require"
 }
 
 model Comercio {
@@ -28,13 +28,13 @@ model Comercio {
 }
 
 model MenuCategory {
-  id           String     @id @default(uuid())
-  name         String
-  comercio   Comercio @relation(fields: [comercioId], references: [id], onDelete: Cascade)
+  id         String    @id @default(uuid())
+  name       String
+  comercio   Comercio  @relation(fields: [comercioId], references: [id], onDelete: Cascade)
   comercioId String
-  product      Product[]
-  createdAt    DateTime   @default(now())
-  updateAt     DateTime   @updatedAt
+  product    Product[]
+  createdAt  DateTime  @default(now())
+  updateAt   DateTime  @updatedAt
 }
 
 model Product {
@@ -43,8 +43,8 @@ model Product {
   description    String
   price          Float
   imageUrl       String
-  comercio     Comercio     @relation(fields: [comercioId], references: [id], onDelete: Cascade)
-  comercioId   String
+  comercio       Comercio       @relation(fields: [comercioId], references: [id], onDelete: Cascade)
+  comercioId     String
   menuCategory   MenuCategory   @relation(fields: [menuCategoryId], references: [id], onDelete: Cascade)
   menuCategoryId String
   orderProduct   OrderProduct[]
@@ -57,13 +57,11 @@ model Order {
   total             Float
   status            OrderStatus
   consumptionMethod ConsumptionMethod
-  comercio        ComercioId        @relation(fields: [comercioId], references: [id], onDelete: Cascade)
-  comercioId      String
+  comercio          Comercio          @relation(fields: [comercioId], references: [id], onDelete: Cascade)
+  comercioId        String
   orderProducts     OrderProduct[]
   customerName      String
-  customerCpf       String
   customerCellPhone String
-  customerAdress    String
   createdAt         DateTime          @default(now())
   updateAt          DateTime          @updatedAt
 }

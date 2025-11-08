@@ -5,16 +5,16 @@ import { db } from "@/lib/prisma";
 import RestaurantCategories from "./components/categories";
 import RestaurantHeader from "./components/header";
 
-interface RestaurantMenuPageProps {
+interface ComercioMenuPageProps {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ consumptionMethod: string }>;
 }
-const RestaurantMenuPage = async ({
+const ComercioMenuPage = async ({
   params,
   searchParams,
-}: RestaurantMenuPageProps) => {
+}: ComercioMenuPageProps) => {
   const { slug } = await params;
-  const restaurant = await db.restaurant.findUnique({
+  const comercio = await db.comercio.findUnique({
     where: { slug },
     include: {
       menuCategory: {
@@ -23,16 +23,16 @@ const RestaurantMenuPage = async ({
     },
   });
   const {} = await searchParams;
-  if (!restaurant) {
+  if (!comercio) {
     return notFound();
   }
 
   return (
     <div>
-      <RestaurantHeader restaurant={restaurant}></RestaurantHeader>
-      <RestaurantCategories restaurant={restaurant}></RestaurantCategories>
+      <RestaurantHeader comercio={comercio}></RestaurantHeader>
+      <RestaurantCategories comercio={comercio}></RestaurantCategories>
     </div>
   );
 };
 
-export default RestaurantMenuPage;
+export default ComercioMenuPage;

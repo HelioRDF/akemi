@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ConsumptionMethod } from "@prisma/client";
-import { Loader2Icon } from "lucide-react";
+import { ChevronLeftIcon, Loader2Icon } from "lucide-react";
 import { useParams, useSearchParams } from "next/navigation";
 import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -32,23 +32,16 @@ import {
 import { Input } from "@/components/ui/input";
 
 import { createOrder } from "../../actions/create-order";
-import { CartContext } from "../../context/cart";
-import { isValidCpf } from "../../helpers/cpf";
+import { CartContext, CartProduct } from "../../context/cart";
 
 const formSchema = z.object({
   name: z.string().trim().min(1, {
     message: "Informe o seu nome!",
   }),
 
-  cpf: z
-    .string()
-    .trim()
-    .min(1, {
-      message: "Informe o seu CPF!",
-    })
-    .refine((value) => isValidCpf(value), {
-      message: "CPF Inválido!",
-    }),
+  cellphone: z.string().trim().min(1, {
+    message: "Informe o seu Telefone!",
+  }),
 });
 type FormSchema = z.infer<typeof formSchema>;
 
@@ -57,40 +50,64 @@ interface FinishOrderDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
+const formatOrderMessage = (name: string, cellphone: string, products: CartProduct[], orderId: number) => {
+  const formattedProducts = products
+    .map((product) => `${product.quantity}x ${product.name} - R$ ${(product.price * product.quantity).toFixed(2)}`)
+    .join('\n');
+  
+  const total = products.reduce((acc, product) => acc + (product.price * product.quantity), 0);
+  
+  return `*Novo Pedido*: #${orderId}\n\nCliente: ${name}\nTelefone: ${cellphone}\n\n*Itens do Pedido:*\n${formattedProducts}\n\n> *Total: R$ ${total.toFixed(2)}*`;
+};
+
 const FinishOrderDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
   const { slug } = useParams<{ slug: string }>();
   const { products } = useContext(CartContext);
   const searchParams = useSearchParams();
-  const [isLoading] = useState(false);
-  //const consumptionMethod = searchParams.get("consumptionMethod");
-  const msgVoltar = "<   Voltar";
+  const [isLoading, setIsLoading] = useState(false);
+  const [showWhatsApp, setShowWhatsApp] = useState(false);
+  const [orderMessage, setOrderMessage] = useState("");
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      cpf: "",
+      cellphone: "",
     },
     shouldUnregister: true,
   });
 
   const onSubmit = async (data: FormSchema) => {
     try {
-      console.log("!!!!!!!");
+      setIsLoading(true);
       const consumptionMethod = searchParams.get(
         "consumptionMethod"
       ) as ConsumptionMethod;
-      await createOrder({
+      
+      // Criar o pedido
+      const order = await createOrder({
         consumptionMethod,
-        customerCpf: data.cpf,
+        customerCellPhone: data.cellphone,
         customerName: data.name,
         products,
         slug,
       });
-      onOpenChange(false);
-      toast.success("Pedido encaminhado com sucesso!");
       
+      if (order) {
+        // Formatar a mensagem para o WhatsApp
+        const message = formatOrderMessage(data.name, data.cellphone, products, order.id);
+        setOrderMessage(message);
+        
+        // Mostrar mensagem de sucesso
+        toast.success("Pedido criado com sucesso!");
+        
+        // Mostrar botão do WhatsApp
+        setShowWhatsApp(true);
+      }
     } catch (error) {
       console.error(error);
+      toast.error("Erro ao enviar o pedido. Tente novamente.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -124,14 +141,14 @@ const FinishOrderDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
 
               <FormField
                 control={form.control}
-                name="cpf"
+                name="cellphone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>CPF</FormLabel>
+                    <FormLabel>Telefone</FormLabel>
                     <FormControl>
                       <PatternFormat
-                        placeholder="Digite o seu CPF"
-                        format="###.###.###-##"
+                        placeholder="Digite o seu Telefone"
+                        format="##-#####-####"
                         customInput={Input}
                         {...field}
                       />
@@ -143,19 +160,55 @@ const FinishOrderDialog = ({ open, onOpenChange }: FinishOrderDialogProps) => {
               />
 
               <DrawerFooter>
-                <Button
-                  type="submit"
-                  className="rounded-full"
-                  variant="destructive"
-                  disabled={isLoading}
-                >
-                  {isLoading && <Loader2Icon className="animate-spin" />}
-                  Confirmar Pedido
-                </Button>
-                <DrawerClose className="w-full rounded-full">
-                    {msgVoltar}
-                 
-                </DrawerClose>
+                {!showWhatsApp ? (
+                  <>
+                    <Button
+                      type="submit"
+                      className="rounded-full"
+                      variant="destructive"
+                      disabled={isLoading}
+                    >
+                      {isLoading && <Loader2Icon className="animate-spin" />}
+                      Criar Pedido
+                    </Button>
+                    <DrawerClose asChild>
+                      <Button 
+                        variant="secondary" 
+                        className="w-full rounded-full flex items-center justify-center gap-2 text-muted-foreground"
+                      >
+                        <ChevronLeftIcon className="h-4 w-4" />
+                        Voltar
+                      </Button>
+                    </DrawerClose>
+                  </>
+                ) : (
+                  <div className="space-y-3 w-full">
+                    <Button
+                      type="button"
+                      className="w-full rounded-full bg-green-500 hover:bg-green-600"
+                      onClick={() => {
+                        const phoneNumber = "5511975640573";
+                        window.open(
+                          `https://wa.me/${phoneNumber}?text=${encodeURIComponent(orderMessage)}`,
+                          '_blank'
+                        );
+                      }}
+                    >
+                      Enviar pedido no WhatsApp
+                    </Button>
+                    <Button
+                      type="button"
+                      className="w-full rounded-full"
+                      variant="secondary"
+                      onClick={() => {
+                        window.location.href = `/${slug}/orders?cellphone=${form.getValues().cellphone}`;
+                      }}
+                    >
+                      Ver meus pedidos
+                    </Button>
+           
+                  </div>
+                )}
               </DrawerFooter>
             </form>
           </Form>

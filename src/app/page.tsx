@@ -1,5 +1,10 @@
+import ComercioPage from "../app/[slug]/page";
+interface ComercioPageProps {
+  params: Promise<{ slug: string }>;
+}
+
 const HomePage = () => {
-  return <h1>Olá Mundo</h1>;
+  return <ComercioPage params={Promise.resolve({ slug: "akemi" })} />;
 };
 
 export default HomePage;

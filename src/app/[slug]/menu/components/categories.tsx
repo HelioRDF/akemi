@@ -12,8 +12,8 @@ import CartSheet from "../[productId]/components/cart-sheet";
 import { CartContext } from "../context/cart";
 import Products from "./products";
 
-interface RestaurantCategoriesProps {
-  restaurant: Prisma.RestaurantGetPayload<{
+interface ComercioCategoriesProps {
+  comercio: Prisma.ComercioGetPayload<{
     include: {
       menuCategory: {
         include: { product: true };
@@ -26,9 +26,9 @@ type MenuCategoryWithProducts = Prisma.MenuCategoryGetPayload<{
   include: { product: true };
 }>;
 
-const RestaurantCategories = ({ restaurant }: RestaurantCategoriesProps) => {
+const ComercioCategories = ({ comercio }: ComercioCategoriesProps) => {
   const [selectedCategory, setSelectedCategory] =
-    useState<MenuCategoryWithProducts>(restaurant.menuCategory[0]);
+    useState<MenuCategoryWithProducts>(comercio.menuCategory[0]);
   const { products, total, toggleCart, totalQuantity } =
     useContext(CartContext);
   const handleCategoryClick = (category: MenuCategoryWithProducts) => {
@@ -42,14 +42,14 @@ const RestaurantCategories = ({ restaurant }: RestaurantCategoriesProps) => {
       <div className="p-5">
         <div className="flex items-center gap-3 ">
           <Image
-            src={restaurant.avatarImageUrl}
-            alt={restaurant.name}
+            src={comercio.avatarImageUrl}
+            alt={comercio.name}
             height={45}
             width={45}
           />
           <div>
-            <h2 className="font-semibold text-lg">{restaurant.name}</h2>
-            <h2 className="text-xs opacity-55">{restaurant.description}</h2>
+            <h2 className="font-semibold text-lg">{comercio.name}</h2>
+            <h2 className="text-xs opacity-55">{comercio.description}</h2>
           </div>
         </div>
         <div className="mt-3 flex items-center gap-1 text-xs text-green-500">
@@ -59,7 +59,7 @@ const RestaurantCategories = ({ restaurant }: RestaurantCategoriesProps) => {
       </div>
       <ScrollArea className="w-full">
         <div className="flex w-max space-x-4 p-5 pt-0">
-          {restaurant.menuCategory.map((category) => (
+          {comercio.menuCategory.map((category) => (
             <Button
               onClick={() => handleCategoryClick(category)}
               key={category.id}
@@ -94,4 +94,4 @@ const RestaurantCategories = ({ restaurant }: RestaurantCategoriesProps) => {
   );
 };
 
-export default RestaurantCategories;
+export default ComercioCategories;

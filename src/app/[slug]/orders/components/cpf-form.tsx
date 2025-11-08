@@ -26,30 +26,29 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-import { isValidCpf, removeCpfPunctuation } from "../../menu/helpers/cpf";
 
 const formSchema = z.object({
-  cpf: z
+  cellphone: z
     .string()
     .trim()
     .min(1, {
-      message: "O CPF é obrigatório.",
+      message: "O Telefone é obrigatório.",
     })
-    .refine((value) => isValidCpf(value), {
-      message: "CPF inválido.",
+    .refine((value) => (value), {
+      message: "Telefone inválido.",
     }),
 });
 
 type FormSchema = z.infer<typeof formSchema>;
 
-const CpfForm = () => {
+const TelefoneForm = () => {
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
   });
   const router = useRouter();
   const pathname = usePathname();
   const onSubmit = (data: FormSchema) => {
-    router.replace(`${pathname}?cpf=${removeCpfPunctuation(data.cpf)}`);
+    router.replace(`${pathname}?cellphone=${data.cellphone}`);
   };
   const handleCancel = () => {
     router.back();
@@ -60,7 +59,7 @@ const CpfForm = () => {
         <DrawerHeader>
           <DrawerTitle>Visualizar Pedidos</DrawerTitle>
           <DrawerDescription>
-            Insira seu CPF abaixo para visualizar seus pedidos.
+            Insira seu Telefone abaixo para visualizar seus pedidos.
           </DrawerDescription>
         </DrawerHeader>
 
@@ -68,14 +67,14 @@ const CpfForm = () => {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <FormField
               control={form.control}
-              name="cpf"
+              name="cellphone"
               render={({ field }) => (
                 <FormItem className="px-4">
-                  <FormLabel>Seu CPF</FormLabel>
+                  <FormLabel>Seu Telefone</FormLabel>
                   <FormControl>
                     <PatternFormat
-                      placeholder="Digite seu CPF..."
-                      format="###.###.###-##"
+                      placeholder="Digite seu Telefone..."
+                      format="##-#####-####"
                       customInput={Input}
                       {...field}
                     />
@@ -105,4 +104,4 @@ const CpfForm = () => {
   );
 };
 
-export default CpfForm;
+export default TelefoneForm;
