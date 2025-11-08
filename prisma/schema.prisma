@@ -9,8 +9,9 @@ generator client {
 }
 datasource db {
   provider = "postgresql"
-  url      = "xxx"
-}
+  url      = env("DATABASE_URL")
+  
+  }
 
 model Comercio {
   id             String         @id @default(uuid())
