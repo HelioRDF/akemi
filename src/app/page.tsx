@@ -3,7 +3,7 @@ interface ComercioPageProps {
   params: Promise<{ slug: string }>;
 }
 
-const HomePage = () => {
+const HomePage = ({}:ComercioPageProps) => {
   return <ComercioPage params={Promise.resolve({ slug: "akemi" })} />;
 };
 

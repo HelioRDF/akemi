@@ -1,7 +1,7 @@
 "use client";
 
 import { Prisma } from "@prisma/client";
-import { ChefHatIcon, ChevronsLeftIcon, ChevronsRightIcon } from "lucide-react";
+import {  ChevronsLeftIcon, ChevronsRightIcon } from "lucide-react";
 import Image from "next/image";
 import { useContext, useState } from "react";
 
